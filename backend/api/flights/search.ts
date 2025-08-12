@@ -68,6 +68,10 @@ const BOOKING_PROVIDERS = {
   gettransfer: {
     template: 'https://gettransfer.tpk.lv/oBw5OAO2?utm_source=wingfinder&utm_medium=affiliate',
     name: 'GetTransfer - Airport Transfers'
+  },
+  compensair: {
+    template: 'https://compensair.tpk.lv/uR0TXuzc?utm_source=wingfinder&utm_medium=affiliate',
+    name: 'Compensair - Flight Compensation'
   }
 };
 
@@ -92,6 +96,7 @@ interface TOffer {
     tripcom: string;
     insurance: string;
     transfer: string;
+    compensation: string;
   };
   provider: 'tequila' | 'travelpayouts' | 'duffel' | 'amadeus';
   valid_until: string;
@@ -131,6 +136,7 @@ function generateBookingUrls(offer: TOffer, adults: number = 1): { [key: string]
     
   urls.insurance = BOOKING_PROVIDERS.ektainsurance.template;
   urls.transfer = BOOKING_PROVIDERS.gettransfer.template;
+  urls.compensation = BOOKING_PROVIDERS.compensair.template;
   
   return urls;
 }
