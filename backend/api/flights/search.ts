@@ -72,6 +72,10 @@ const BOOKING_PROVIDERS = {
   compensair: {
     template: 'https://compensair.tpk.lv/uR0TXuzc?utm_source=wingfinder&utm_medium=affiliate',
     name: 'Compensair - Flight Compensation'
+  },
+  airalo: {
+    template: 'https://airalo.tpk.lv/OEGVySUX?utm_source=wingfinder&utm_medium=affiliate',
+    name: 'Airalo - International eSIM & Data Plans'
   }
 };
 
@@ -97,6 +101,7 @@ interface TOffer {
     insurance: string;
     transfer: string;
     compensation: string;
+    esim: string;
   };
   provider: 'tequila' | 'travelpayouts' | 'duffel' | 'amadeus';
   valid_until: string;
@@ -137,6 +142,7 @@ function generateBookingUrls(offer: TOffer, adults: number = 1): { [key: string]
   urls.insurance = BOOKING_PROVIDERS.ektainsurance.template;
   urls.transfer = BOOKING_PROVIDERS.gettransfer.template;
   urls.compensation = BOOKING_PROVIDERS.compensair.template;
+  urls.esim = BOOKING_PROVIDERS.airalo.template;
   
   return urls;
 }
