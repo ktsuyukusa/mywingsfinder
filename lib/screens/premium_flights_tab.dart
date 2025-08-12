@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mywingsfinder/data/airports.dart';
 import 'package:mywingsfinder/widgets/flight_card.dart';
-import 'package:mywingsfinder/widgets/search_filters.dart';
 import 'package:mywingsfinder/models/flight.dart';
-import 'package:mywingsfinder/services/flight_repository.dart';
+import 'package:mywingsfinder/services/deal_discovery_service.dart';
 import 'package:mywingsfinder/l10n/app_localizations_simple.dart';
+import 'dart:async';
 
+/// Premium Flights Tab - Shows automatically discovered premium deals
 class PremiumFlightsTab extends StatefulWidget {
   const PremiumFlightsTab({super.key});
 
@@ -14,304 +14,288 @@ class PremiumFlightsTab extends StatefulWidget {
 }
 
 class _PremiumFlightsTabState extends State<PremiumFlightsTab> {
-  List<Flight> _flights = [];
-  String? _selectedDeparture;
-  String? _selectedArrival;
-  String _selectedClass = 'All';
-  bool _showOnlyDirect = false;
+  List<Flight> _premiumDeals = [];
+  bool _isLoading = true;
+  String _selectedFilter = 'all';
+  final DealDiscoveryService _dealService = DealDiscoveryService();
 
   @override
   void initState() {
     super.initState();
-    _loadFlights();
+    _loadPremiumDeals();
+    
+    // Refresh deals every 30 seconds
+    Timer.periodic(const Duration(seconds: 30), (_) {
+      _loadPremiumDeals();
+    });
   }
 
-  void _loadFlights() async {
+  Future<void> _loadPremiumDeals() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      final repository = FlightRepository();
-      final flights = await repository.getPremiumFlights(
-        flightClass: _selectedClass == 'All' ? null : _selectedClass,
-      );
+      // Get premium deals
+      final deals = _dealService.getDealsByCategory('premium');
+      
+      // Apply additional filters
+      List<Flight> filteredDeals;
+      switch (_selectedFilter) {
+        case 'business':
+          filteredDeals = deals.where((f) => f.flightClass == 'Business').toList();
+          break;
+        case 'first':
+          filteredDeals = deals.where((f) => f.flightClass == 'First').toList();
+          break;
+        case 'luxury':
+          filteredDeals = deals.where((f) => f.price > 2000).toList();
+          break;
+        case 'latest':
+          filteredDeals = _dealService.getLatestDeals()
+              .where((f) => f.isPremium)
+              .toList();
+          break;
+        default:
+          filteredDeals = deals;
+      }
+
       setState(() {
-        _flights = flights;
+        _premiumDeals = filteredDeals;
+        _isLoading = false;
       });
     } catch (e) {
-      print('Error loading premium flights: $e');
+      print('Error loading premium deals: $e');
       setState(() {
-        _flights = [];
+        _isLoading = false;
       });
     }
   }
 
-  List<Flight> get _filteredFlights {
-    var filtered = _flights;
-
-    if (_selectedDeparture != null) {
-      filtered = filtered.where((f) => f.departureCode == _selectedDeparture).toList();
-    }
-
-    if (_selectedArrival != null) {
-      filtered = filtered.where((f) => f.arrivalCode == _selectedArrival).toList();
-    }
-
-    if (_selectedClass != 'All') {
-      filtered = filtered.where((f) => f.flightClass == _selectedClass).toList();
-    }
-
-    if (_showOnlyDirect) {
-      filtered = filtered.where((f) => f.isDirect).toList();
-    }
-
-    filtered.sort((a, b) => a.price.compareTo(b.price));
-    return filtered;
-  }
-
-  void _clearFilters() {
+  void _onFilterChanged(String filter) {
     setState(() {
-      _selectedDeparture = null;
-      _selectedArrival = null;
-      _selectedClass = 'All';
-      _showOnlyDirect = false;
+      _selectedFilter = filter;
     });
+    _loadPremiumDeals();
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    
     return Column(
       children: [
+        // Premium deals header
         Container(
-          color: Theme.of(context).colorScheme.primaryContainer,
           padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.secondary,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          margin: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                l10n.premiumPrivateFlights,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '💎 Premium Deal Discovery',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Icon(
+                    Icons.diamond,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               Text(
-                l10n.businessFirstPrivateDeals,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.8),
+                'Luxury flights at unbeatable prices • ${_premiumDeals.length} premium deals',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.white.withOpacity(0.9),
                 ),
               ),
             ],
           ),
         ),
 
+        // Filter chips
         Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedDeparture,
-                      isExpanded: true,
-                      decoration: InputDecoration(
-                        labelText: l10n.fromJapan,
-                        border: const OutlineInputBorder(),
-                        prefixIcon: Icon(
-                          Icons.flight_takeoff,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        fillColor: Theme.of(context).colorScheme.surface,
-                        filled: true,
-                      ),
-                      items: [
-                        DropdownMenuItem(value: null, child: Text(l10n.allJapaneseAirports)),
-                        ...Airports.japaneseAirports.map((airport) =>
-                          DropdownMenuItem(
-                            value: airport.code,
-                            child: Text(
-                              '${airport.code} - ${airport.city}',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) => setState(() => _selectedDeparture = value),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedArrival,
-                      isExpanded: true,
-                      decoration: InputDecoration(
-                        labelText: l10n.toEurope,
-                        border: const OutlineInputBorder(),
-                        prefixIcon: Icon(
-                          Icons.flight_land,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        fillColor: Theme.of(context).colorScheme.surface,
-                        filled: true,
-                      ),
-                      items: [
-                        DropdownMenuItem(value: null, child: Text(l10n.allEuropeanAirports)),
-                        ...Airports.europeanAirports.map((airport) =>
-                          DropdownMenuItem(
-                            value: airport.code,
-                            child: Text(
-                              '${airport.code} - ${airport.city}',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) => setState(() => _selectedArrival = value),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedClass,
-                      isExpanded: true,
-                      decoration: InputDecoration(
-                        labelText: l10n.flightClass,
-                        border: const OutlineInputBorder(),
-                        prefixIcon: Icon(
-                          Icons.airline_seat_flat,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        fillColor: Theme.of(context).colorScheme.surface,
-                        filled: true,
-                      ),
-                      items: [
-                        DropdownMenuItem(value: 'All', child: Text(l10n.allClasses)),
-                        DropdownMenuItem(value: 'Business', child: Text(l10n.businessClass)),
-                        DropdownMenuItem(value: 'First', child: Text(l10n.firstClass)),
-                        DropdownMenuItem(value: 'Private', child: Text(l10n.privateJet)),
-                      ],
-                      onChanged: (value) => setState(() => _selectedClass = value!),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Checkbox(
-                          value: _showOnlyDirect,
-                          onChanged: (value) => setState(() => _showOnlyDirect = value!),
-                        ),
-                        Expanded(
-                          child: Text(
-                            l10n.directFlightsOnly,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              if (_selectedDeparture != null || _selectedArrival != null || _selectedClass != 'All' || _showOnlyDirect)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      onPressed: _clearFilters,
-                      icon: const Icon(Icons.clear),
-                      label: Text(l10n.clearFilters),
-                    ),
-                  ),
-                ),
-            ],
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildFilterChip('all', 'All Premium', Icons.flight_class),
+                const SizedBox(width: 8),
+                _buildFilterChip('business', 'Business', Icons.business),
+                const SizedBox(width: 8),
+                _buildFilterChip('first', 'First Class', Icons.king_bed),
+                const SizedBox(width: 8),
+                _buildFilterChip('luxury', 'Luxury (>$2K)', Icons.workspace_premium),
+                const SizedBox(width: 8),
+                _buildFilterChip('latest', 'Latest (24h)', Icons.access_time),
+              ],
+            ),
           ),
         ),
 
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        const SizedBox(height: 16),
+
+        // Results count
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                l10n.premiumFlightsFound(_filteredFlights.length),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                '${_premiumDeals.length} premium deals found',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.star,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.tertiary,
+              Row(
+                children: [
+                  Text(
+                    'Updated ${_getTimeAgo()}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      l10n.vipDeals,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.tertiary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: _loadPremiumDeals,
+                    icon: const Icon(Icons.refresh),
+                    tooltip: 'Refresh premium deals',
+                  ),
+                ],
               ),
             ],
           ),
         ),
 
+        const SizedBox(height: 16),
+
+        // Deals list
         Expanded(
-          child: _filteredFlights.isEmpty
-              ? Center(
+          child: _isLoading
+              ? const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.flight_class,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.noPremiumFlights,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: _clearFilters,
-                        child: Text(l10n.clearFilters),
-                      ),
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Discovering premium deals...'),
                     ],
                   ),
                 )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _filteredFlights.length,
-                  itemBuilder: (context, index) {
-                    final flight = _filteredFlights[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: FlightCard(flight: flight),
-                    );
-                  },
-                ),
+              : _premiumDeals.isEmpty
+                  ? _buildEmptyState()
+                  : _buildPremiumDealsList(),
         ),
       ],
     );
+  }
+
+  Widget _buildFilterChip(String filter, String label, IconData icon) {
+    final isSelected = _selectedFilter == filter;
+    return FilterChip(
+      selected: isSelected,
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16),
+          const SizedBox(width: 4),
+          Text(label),
+        ],
+      ),
+      onSelected: (_) => _onFilterChanged(filter),
+      selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+      checkmarkColor: Theme.of(context).colorScheme.primary,
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.flight_class,
+            size: 64,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No premium deals found yet',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Our premium deal hunters are searching for luxury offers.\nCheck back soon for exclusive deals!',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: _loadPremiumDeals,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Refresh'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumDealsList() {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: _premiumDeals.length,
+      itemBuilder: (context, index) {
+        final deal = _premiumDeals[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: FlightCard(flight: deal),
+        );
+      },
+    );
+  }
+
+  String _getTimeAgo() {
+    if (_premiumDeals.isEmpty) return 'never';
+    
+    final now = DateTime.now();
+    final latestDeal = _premiumDeals.first;
+    final difference = now.difference(latestDeal.asOf);
+    
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}m ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ago';
+    } else {
+      return '${difference.inDays}d ago';
+    }
   }
 }

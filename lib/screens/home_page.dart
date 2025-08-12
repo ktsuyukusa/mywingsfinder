@@ -8,6 +8,7 @@ import 'package:mywingsfinder/screens/terms_page.dart';
 import 'package:mywingsfinder/screens/eula_page.dart';
 import 'package:mywingsfinder/l10n/app_localizations_simple.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mywingsfinder/services/deal_discovery_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,6 +24,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    
+    // Start continuous deal discovery when app launches
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final dealService = DealDiscoveryService();
+      dealService.startDiscovery();
+      print('🚀 Deal discovery service started');
+    });
   }
 
   @override
