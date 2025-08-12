@@ -1,5 +1,5 @@
 {
-  "buildCommand": "flutter build web --release --base-href /",
+  "buildCommand": "curl -o- https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz | tar -xJf - && export PATH=\"$PATH:$PWD/flutter/bin\" && flutter build web --release --base-href /",
   "outputDirectory": "build/web",
   "routes": [
     { "handle": "filesystem" },
