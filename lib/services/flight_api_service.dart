@@ -8,8 +8,8 @@ class FlightApiService {
   factory FlightApiService() => _instance;
   FlightApiService._internal();
 
-  // TODO: Replace with your actual Cloud Function URL
-  static const String baseUrl = 'https://your-cloud-function-url.cloudfunctions.net/api';
+  // Your Vercel backend API URL
+  static const String baseUrl = 'https://mywingsfinder.vercel.app/api';
   
   /// Search flights using your backend API aggregation
   /// GET /flights/search?from=NRT&to=EU&date=2025-08-26&class=economy
@@ -38,9 +38,17 @@ class FlightApiService {
       ).timeout(const Duration(seconds: 30));
       
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        print('Found ${data.length} flight offers');
-        return data.map((offer) => Flight.fromApiOffer(offer)).toList();
+        final Map<String, dynamic> data = json.decode(response.body);
+        print('API Response: $data');
+        
+        if (data.containsKey('offers') && data['offers'] is List) {
+          final List<dynamic> offers = data['offers'];
+          print('Found ${offers.length} flight offers from ${data['data_source'] ?? 'API'}');
+          return offers.map((offer) => Flight.fromApiOffer(offer)).toList();
+        } else {
+          print('No offers found in API response');
+          return [];
+        }
       } else {
         throw Exception('API Error: ${response.statusCode} - ${response.body}');
       }

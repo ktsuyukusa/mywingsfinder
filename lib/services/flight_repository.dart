@@ -1,6 +1,5 @@
 import 'package:mywingsfinder/models/flight.dart';
 import 'package:mywingsfinder/services/flight_api_service.dart';
-import 'package:mywingsfinder/data/mock_flights.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -50,22 +49,12 @@ class FlightRepository {
         print('FlightRepository: Cached ${liveFlights.length} real flights from API');
         return liveFlights;
       } else {
-        print('FlightRepository: API returned empty results, using sample data');
-        // Fallback to sample data when API returns empty
-        if (flightClass.toLowerCase() == 'economy') {
-          return MockFlights.getBudgetFlights();
-        } else {
-          return MockFlights.getPremiumFlights();
-        }
+        print('FlightRepository: API returned empty results - no flights found');
+        return [];
       }
     } catch (e) {
-      print('FlightRepository: API fetch failed: $e, using sample data');
-      // Fallback to sample data when API fails
-      if (flightClass.toLowerCase() == 'economy') {
-        return MockFlights.getBudgetFlights();
-      } else {
-        return MockFlights.getPremiumFlights();
-      }
+      print('FlightRepository: API fetch failed: $e');
+      return [];
     }
   }
 
