@@ -145,7 +145,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, User-Agent');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type', Authorization, User-Agent');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -160,55 +160,133 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log(`Flight search: ${from} → ${to} on ${date} (${cabinClass})`);
 
-    // For now, return structured demo data until you configure real API keys
-    const demoOffers: TOffer[] = [
-      {
-        id: 'teq_nrt_prg_001',
-        from: 'NRT',
-        to: 'PRG',
-        price: 312,
-        currency: 'USD',
-        departure_time: '2025-08-26T14:30:00Z',
-        arrival_time: '2025-08-27T08:15:00Z',
-        duration_minutes: 1065,
-        airline: 'Turkish Airlines',
-        flight_number: 'TK 198 / TK 1767',
-        aircraft: 'Boeing 787-9 / Airbus A321',
-        cabin_class: 'economy',
-        stops: 1,
-        route: ['NRT', 'IST', 'PRG'],
-        provider: 'tequila',
-        valid_until: '2025-08-26T12:00:00Z'
-      },
-      {
-        id: 'teq_kix_bud_002', 
-        from: 'KIX',
-        to: 'BUD',
-        price: 298,
-        currency: 'USD',
-        departure_time: '2025-08-26T16:45:00Z',
-        arrival_time: '2025-08-27T07:30:00Z',
-        duration_minutes: 925,
-        airline: 'Turkish Airlines',
-        flight_number: 'TK 199 / TK 1037',
-        aircraft: 'Boeing 787-9 / Airbus A320',
-        cabin_class: 'economy',
-        stops: 1,
-        route: ['KIX', 'IST', 'BUD'],
-        provider: 'tequila',
-        valid_until: '2025-08-26T12:00:00Z'
+    // Check if we have Travelpayouts API key
+    if (!API_CONFIG.travelpayouts.apiKey) {
+      return res.status(500).json({ 
+        error: 'Travelpayouts API key not configured',
+        message: 'Please set TRAVELPAYOUTS_API_KEY in environment variables'
+      });
+    }
+
+    // Real API call to Travelpayouts
+    const searchParams = new URLSearchParams({
+      origin: from as string,
+      destination: to as string,
+      depart_date: date as string,
+      return_date: '', // One-way for now
+      adults: '1',
+      children: '0',
+      infants: '0',
+      currency: 'USD',
+      locale: 'en',
+      token: API_CONFIG.travelpayouts.apiKey
+    });
+
+    const travelpayoutsUrl = `${API_CONFIG.travelpayouts.baseUrl}/v1/prices/cheap?${searchParams}`;
+    
+    console.log('Calling Travelpayouts API:', travelpayoutsUrl);
+    
+    const response = await axios.get(travelpayoutsUrl, {
+      timeout: 30000,
+      headers: {
+        'User-Agent': 'MyWingsFinder/1.0'
       }
-    ];
+    });
 
-    // Add booking URLs to each offer
-    const offersWithBookingUrls = demoOffers.map(offer => ({
-      ...offer,
-      booking_urls: generateBookingUrls(offer, 1)
-    }));
+    if (!response.data || !response.data.data) {
+      throw new Error('Invalid response from Travelpayouts API');
+    }
 
-    res.status(200).json(offersWithBookingUrls);
+    const flightData = response.data.data;
+    const offers: TOffer[] = [];
+
+    // Process real flight data from Travelpayouts
+    for (const [route, routeData] of Object.entries(flightData)) {
+      if (routeData && typeof routeData === 'object' && '0' in routeData) {
+        const flight = routeData['0'];
+        
+        if (flight && flight.price) {
+          const [origin, destination] = route.split('-');
+          
+          offers.push({
+            id: `tp_${origin}_${destination}_${flight.airline}_${flight.flight_number}`,
+            from: origin,
+            to: destination,
+            price: flight.price,
+            currency: 'USD',
+            departure_time: `${date}T${flight.departure_time}:00Z`,
+            arrival_time: `${date}T${flight.arrival_time}:00Z`,
+            duration_minutes: flight.duration || 0,
+            airline: flight.airline || 'Unknown',
+            flight_number: flight.flight_number || 'Unknown',
+            aircraft: 'Unknown',
+            cabin_class: 'economy',
+            stops: flight.transfers || 0,
+            route: [origin, destination],
+            booking_urls: generateBookingUrls({
+              id: '',
+              from: origin,
+              to: destination,
+              price: flight.price,
+              currency: 'USD',
+              departure_time: `${date}T${flight.departure_time}:00Z`,
+              arrival_time: `${date}T${flight.arrival_time}:00Z`,
+              duration_minutes: flight.duration || 0,
+              airline: flight.airline || 'Unknown',
+              flight_number: flight.flight_number || 'Unknown',
+              aircraft: 'Unknown',
+              cabin_class: 'economy',
+              stops: flight.transfers || 0,
+              route: [origin, destination],
+              booking_urls: {} as any,
+              provider: 'travelpayouts',
+              valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+            }, 1),
+            provider: 'travelpayouts',
+            valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+          });
+        }
+      }
+    }
+
+    if (offers.length === 0) {
+      return res.status(200).json({
+        message: 'No flights found for the specified criteria',
+        offers: [],
+        search_params: { from, to, date, cabinClass }
+      });
+    }
+
+    console.log(`Found ${offers.length} real flights from Travelpayouts API`);
+    res.status(200).json({
+      offers,
+      search_params: { from, to, date, cabinClass },
+      total_found: offers.length,
+      data_source: 'Travelpayouts API'
+    });
+
   } catch (error) {
     console.error('Flight search error:', error);
-    res.status(500).json({ error: 'Flight search failed' });
+    
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        return res.status(401).json({ 
+          error: 'Invalid API key',
+          message: 'Please check your Travelpayouts API key'
+        });
+      }
+      if (error.response?.status === 429) {
+        return res.status(429).json({ 
+          error: 'Rate limit exceeded',
+          message: 'Too many requests to Travelpayouts API'
+        });
+      }
+    }
+    
+    res.status(500).json({ 
+      error: 'Flight search failed',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
   }
 }
