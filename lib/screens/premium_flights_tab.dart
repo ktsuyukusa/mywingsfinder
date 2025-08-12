@@ -146,7 +146,7 @@ class _PremiumFlightsTabState extends State<PremiumFlightsTab> {
                 const SizedBox(width: 8),
                 _buildFilterChip('first', 'First Class', Icons.king_bed),
                 const SizedBox(width: 8),
-                _buildFilterChip('luxury', 'Luxury (>$2K)', Icons.workspace_premium),
+                _buildFilterChip('luxury', 'Luxury (>\\\$2K)', Icons.workspace_premium),
                 const SizedBox(width: 8),
                 _buildFilterChip('latest', 'Latest (24h)', Icons.access_time),
               ],

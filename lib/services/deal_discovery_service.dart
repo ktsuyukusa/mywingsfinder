@@ -82,14 +82,14 @@ class DealDiscoveryService {
   /// Get deals by departure airport
   List<Flight> getDealsFromAirport(String airportCode) {
     return _discoveredDeals
-        .where((f) => f.from == airportCode)
+        .where((f) => f.departureCode == airportCode)
         .toList();
   }
 
   /// Get deals by destination region
   List<Flight> getDealsToRegion(String region) {
     return _discoveredDeals
-        .where((f) => f.to.startsWith(region))
+        .where((f) => f.arrivalCode.startsWith(region))
         .toList();
   }
 

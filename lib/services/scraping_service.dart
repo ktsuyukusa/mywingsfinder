@@ -162,7 +162,7 @@ class ScrapingService {
   Future<List<Flight>> _scrapeSingleWebsite(String url, String sourceName) async {
     try {
       // Use proxy if required
-      final client = config['requires_proxy'] == true 
+      final client = sourceName == 'google_flights' && _dataSources['google_flights']!['requires_proxy'] == true 
           ? _getHttpClientWithProxy()
           : http.Client();
       
@@ -266,28 +266,22 @@ class ScrapingService {
               ? airlineMatches.elementAt(i).group(1) ?? 'Unknown'
               : 'Unknown';
           
-          deals.add(Flight(
-            id: 'scraped_${source}_${i}_${DateTime.now().millisecondsSinceEpoch}',
-            from: from,
-            to: to,
-            departureTime: DateTime.now().add(const Duration(days: 30)).toIso8601String(),
-            arrivalTime: DateTime.now().add(const Duration(days: 30, hours: 12)).toIso8601String(),
-            price: price.toDouble(),
-            airline: airline,
-            flightClass: 'Economy',
-            isDirect: true,
-            isMistakeFare: price < 400,
-            asOf: DateTime.now(),
-            bookingUrls: {
-              'direct': 'https://www.google.com/travel/flights?q=$from-$to',
-              'expedia': 'https://www.expedia.com/Flights-Search?trip=oneway&leg1=from:$from,to:$to',
-              'tripcom': 'https://www.trip.com/flights/$from-$to-tickets/',
-              'insurance': 'https://ektatraveling.tpk.lv/2OPRDOIC?utm_source=wingfinder&utm_medium=affiliate',
-              'transfer': 'https://gettransfer.tpk.lv/oBw5OAO2?utm_source=wingfinder&utm_medium=affiliate',
-              'compensation': 'https://compensair.tpk.lv/uR0TXuzc?utm_source=wingfinder&utm_medium=affiliate',
-              'esim': 'https://airalo.tpk.lv/OEGVySUX?utm_source=wingfinder&utm_medium=affiliate',
-            },
-          ));
+                                  deals.add(Flight(
+              id: 'scraped_${source}_${i}_${DateTime.now().millisecondsSinceEpoch}',
+              departureCode: from,
+              departureName: 'Airport $from',
+              arrivalCode: to,
+              arrivalName: 'Airport $to',
+              airline: airline,
+              departureDate: DateTime.now().add(const Duration(days: 30)),
+              price: price.toDouble(),
+              currency: 'USD',
+              flightClass: 'Economy',
+              isDirect: true,
+              bookingUrl: 'https://www.google.com/travel/flights?q=$from-$to',
+              isMistakeFare: price < 400,
+              asOf: DateTime.now(),
+            ));
         }
       }
     } catch (e) {

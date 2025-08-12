@@ -133,7 +133,7 @@ class AlertService {
   /// Determine if we should send an alert
   bool _shouldSendAlert(Flight deal, String alertType) {
     // Check alert preferences
-    if (!_alertPreferences[alertType] ?? false) {
+    if (!(_alertPreferences[alertType] ?? false)) {
       return false;
     }
 
@@ -168,9 +168,9 @@ ${deal.isDirect ? '🛫 Direct Flight' : '🔄 Connecting Flight'}
 ${deal.isMistakeFare ? '⚡ MISTAKE FARE!' : ''}
 
 ⏰ Found: ${_formatTimeAgo(deal.asOf)}
-🔗 Book now: ${deal.bookingUrls['expedia'] ?? 'Check app for details'}
+🔗 Book now: ${deal.bookingUrl ?? 'Check app for details'}
 
-#MyWingsFinder #FlightDeals #${deal.from}${deal.to}
+#MyWingsFinder #FlightDeals #${deal.departureCode}${deal.arrivalCode}
 ''';
   }
 
@@ -190,7 +190,7 @@ $emoji $alertType.toUpperCase() ALERT!
     for (int i = 0; i < 3 && i < deals.length; i++) {
       final deal = deals[i];
       message += '''
-${i + 1}. ${deal.from} → ${deal.to} - \$${deal.price.toStringAsFixed(0)} (${deal.airline})
+${i + 1}. ${deal.departureCode} → ${deal.arrivalCode} - \$${deal.price.toStringAsFixed(0)} (${deal.airline})
 ''';
     }
 
@@ -223,7 +223,7 @@ ${i + 1}. ${deal.from} → ${deal.to} - \$${deal.price.toStringAsFixed(0)} (${de
 💎 Premium Deals: $premiumDeals
 
 🏆 Best Deal of the Day:
-${deals.isNotEmpty ? '${deals.first.from} → ${deals.first.to} - \$${deals.first.price.toStringAsFixed(0)}' : 'No deals found'}
+${deals.isNotEmpty ? '${deals.first.departureCode} → ${deals.first.arrivalCode} - \$${deals.first.price.toStringAsFixed(0)}' : 'No deals found'}
 
 🔗 View all deals in the MyWingsFinder app
 #MyWingsFinder #DailySummary #FlightDeals

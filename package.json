@@ -1,0 +1,14 @@
+{
+  "name": "mywingsfinder",
+  "version": "1.0.0",
+  "description": "Flight deal discovery platform",
+  "scripts": {
+    "build": "flutter build web --release --base-href /",
+    "dev": "flutter run -d web-server --web-port 3000"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
