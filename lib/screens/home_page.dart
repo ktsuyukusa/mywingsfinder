@@ -186,12 +186,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 const Divider(),
                 ListTile(
                   leading: Icon(Icons.language, color: theme.primaryColor),
-                  title: Text('www.mywingsfinder.com', style: GoogleFonts.inter(fontSize: 14)),
+                  title: Text('mywingsfinder.vercel.app', style: GoogleFonts.inter(fontSize: 14)),
                   subtitle: Text('Visit our website', style: GoogleFonts.inter(fontSize: 12)),
                 ),
                 ListTile(
                   leading: Icon(Icons.email, color: theme.primaryColor),
-                  title: Text('support@mywingsfinder.com', style: GoogleFonts.inter(fontSize: 14)),
+                  title: Text('support@mywingsfinder.vercel.app', style: GoogleFonts.inter(fontSize: 14)),
                   subtitle: Text('Contact support', style: GoogleFonts.inter(fontSize: 12)),
                 ),
               ],
