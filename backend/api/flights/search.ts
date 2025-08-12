@@ -51,6 +51,26 @@ const CARRIER_DEEPLINKS: { [key: string]: { template: string; supports_roundtrip
   }
 };
 
+// Additional booking providers
+const BOOKING_PROVIDERS = {
+  expedia: {
+    template: 'https://www.expedia.com/Flights-Search?trip=oneway&leg1=from:{origin},to:{destination},departure:{date}TANYT&passengers=adults:{adults}&options=cabinclass:{cabin_class}&affcid=AjmUZGx',
+    name: 'Expedia'
+  },
+  tripcom: {
+    template: 'https://www.trip.com/flights/{origin}-{destination}-tickets/?departure={date}&adult={adults}&cabin={cabin_class}&utm_source=wingfinder&utm_medium=affiliate',
+    name: 'Trip.com'
+  },
+  ektainsurance: {
+    template: 'https://ektatraveling.tpk.lv/2OPRDOIC?utm_source=wingfinder&utm_medium=affiliate',
+    name: 'EKTA Travel Insurance'
+  },
+  gettransfer: {
+    template: 'https://gettransfer.tpk.lv/oBw5OAO2?utm_source=wingfinder&utm_medium=affiliate',
+    name: 'GetTransfer - Airport Transfers'
+  }
+};
+
 interface TOffer {
   id: string;
   from: string;
@@ -66,25 +86,53 @@ interface TOffer {
   cabin_class: 'economy' | 'premium_economy' | 'business' | 'first';
   stops: number;
   route: string[];
-  deeplink_url?: string;
+  booking_urls: {
+    direct?: string;
+    expedia: string;
+    tripcom: string;
+    insurance: string;
+    transfer: string;
+  };
   provider: 'tequila' | 'travelpayouts' | 'duffel' | 'amadeus';
   valid_until: string;
 }
 
-// Helper function to generate booking URL
-function generateBookingUrl(offer: TOffer, adults: number = 1): string {
-  const carrier = CARRIER_DEEPLINKS[offer.airline];
-  if (!carrier) {
-    // Fallback to generic booking URL
-    return `https://www.expedia.com/Flights-Search?trip=oneway&leg1=from:${offer.from},to:${offer.to},departure:${offer.departure_time.split('T')[0]}TANYT&passengers=adults:${adults}&options=cabinclass:${offer.cabin_class}&affcid=AjmUZGx`;
-  }
-
+// Helper function to generate booking URLs for multiple providers
+function generateBookingUrls(offer: TOffer, adults: number = 1): { [key: string]: string } {
   const departureDate = offer.departure_time.split('T')[0];
-  return carrier.template
+  const cabinClass = offer.cabin_class === 'economy' ? 'economy' : 'business';
+  
+  const urls: { [key: string]: string } = {};
+  
+  // Check if airline has direct deeplink
+  const carrier = CARRIER_DEEPLINKS[offer.airline];
+  if (carrier) {
+    urls.direct = carrier.template
+      .replace('{origin}', offer.from)
+      .replace('{destination}', offer.to)
+      .replace('{date}', departureDate)
+      .replace('{adults}', adults.toString());
+  }
+  
+  // Generate URLs for all booking providers
+  urls.expedia = BOOKING_PROVIDERS.expedia.template
     .replace('{origin}', offer.from)
     .replace('{destination}', offer.to)
     .replace('{date}', departureDate)
-    .replace('{adults}', adults.toString());
+    .replace('{adults}', adults.toString())
+    .replace('{cabin_class}', cabinClass);
+    
+  urls.tripcom = BOOKING_PROVIDERS.tripcom.template
+    .replace('{origin}', offer.from)
+    .replace('{destination}', offer.to)
+    .replace('{date}', departureDate)
+    .replace('{adults}', adults.toString())
+    .replace('{cabin_class}', cabinClass);
+    
+  urls.insurance = BOOKING_PROVIDERS.ektainsurance.template;
+  urls.transfer = BOOKING_PROVIDERS.gettransfer.template;
+  
+  return urls;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -149,7 +197,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Add booking URLs to each offer
     const offersWithBookingUrls = demoOffers.map(offer => ({
       ...offer,
-      deeplink_url: generateBookingUrl(offer, 1)
+      booking_urls: generateBookingUrls(offer, 1)
     }));
 
     res.status(200).json(offersWithBookingUrls);
