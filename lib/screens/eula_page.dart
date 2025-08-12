@@ -26,9 +26,9 @@ class EulaPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.1),
+                color: theme.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: theme.primaryColor.withValues(alpha: 0.2)),
+                border: Border.all(color: theme.primaryColor.withOpacity(0.2)),
               ),
               child: Row(
                 children: [
@@ -210,9 +210,9 @@ class EulaPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.1),
+                color: theme.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: theme.primaryColor.withValues(alpha: 0.2)),
+                border: Border.all(color: theme.primaryColor.withOpacity(0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           controller: _tabController,
           indicatorColor: Theme.of(context).colorScheme.primary,
           labelColor: Theme.of(context).colorScheme.primary,
-          unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+          unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           tabs: [
             Tab(
               text: l10n.budgetFlights,

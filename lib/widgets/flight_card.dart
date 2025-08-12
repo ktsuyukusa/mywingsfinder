@@ -108,7 +108,7 @@ class FlightCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
         ),
       ),
       child: Padding(
@@ -121,7 +121,7 @@ class FlightCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getClassColor(context, flight.flightClass).withValues(alpha: 0.1),
+                    color: _getClassColor(context, flight.flightClass).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -144,7 +144,7 @@ class FlightCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                      color: Theme.of(context).colorScheme.error.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -170,7 +170,7 @@ class FlightCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -211,7 +211,7 @@ class FlightCard extends StatelessWidget {
                       Text(
                         flight.departureName,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
                     ],
@@ -228,7 +228,7 @@ class FlightCard extends StatelessWidget {
                       Text(
                         flight.layovers.join(', '),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                   ],
@@ -247,7 +247,7 @@ class FlightCard extends StatelessWidget {
                       Text(
                         flight.arrivalName,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                         textAlign: TextAlign.end,
                       ),
@@ -264,7 +264,7 @@ class FlightCard extends StatelessWidget {
                 Icon(
                   Icons.calendar_today,
                   size: 16,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -272,20 +272,20 @@ class FlightCard extends StatelessWidget {
                     ? '${_formatDate(flight.departureDate)} - ${_formatDate(flight.returnDate!)}'
                     : _formatDate(flight.departureDate),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Icon(
                   Icons.business,
                   size: 16,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   flight.airline,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                   ),
                 ),
               ],
@@ -335,7 +335,7 @@ class FlightCard extends StatelessWidget {
                     Text(
                       flight.isRoundTrip ? l10n.roundTrip : l10n.oneWay,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],

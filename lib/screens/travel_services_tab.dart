@@ -25,7 +25,7 @@ class TravelServicesTab extends StatelessWidget {
           Text(
             'Premium services for executive travelers',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             ),
           ),
           const SizedBox(height: 24),
@@ -171,7 +171,7 @@ class ServiceCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -195,7 +195,7 @@ class ServiceCard extends StatelessWidget {
                     Text(
                       description,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                       ),
                     ),
                   ],
@@ -204,7 +204,7 @@ class ServiceCard extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               ),
             ],
           ),

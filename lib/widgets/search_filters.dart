@@ -117,7 +117,7 @@ class SearchFilters extends StatelessWidget {
                   size: 18,
                   color: showOnlyDirect 
                     ? Theme.of(context).colorScheme.onSecondaryContainer
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               FilterChip(
@@ -129,7 +129,7 @@ class SearchFilters extends StatelessWidget {
                   size: 18,
                   color: showOnlyVisaFree 
                     ? Theme.of(context).colorScheme.onSecondaryContainer
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               FilterChip(
@@ -141,7 +141,7 @@ class SearchFilters extends StatelessWidget {
                   size: 18,
                   color: showOnlyMistakeFares 
                     ? Theme.of(context).colorScheme.onErrorContainer
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             ],

@@ -1,5 +1,3 @@
-// ignore: unused_import
-import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -42,12 +40,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roundTrip => 'Round-trip';
 
   @override
-  String get budgetTabDescription =>
-      'Budget flights under \$399 one-way / \$650 round-trip';
+  String get budgetTabDescription => 'Budget flights under \$399 one-way / \$650 round-trip';
 
   @override
-  String get premiumTabDescription =>
-      'Premium flights, business class, and VIP options';
+  String get premiumTabDescription => 'Premium flights, business class, and VIP options';
 
   @override
   String get airline => 'Airline';
@@ -163,8 +159,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumPrivateFlights => 'Premium & Private Flights';
 
   @override
-  String get businessFirstPrivateDeals =>
-      'Business, First Class & Private Jet deals';
+  String get businessFirstPrivateDeals => 'Business, First Class & Private Jet deals';
 
   @override
   String get fromJapan => 'From Japan';

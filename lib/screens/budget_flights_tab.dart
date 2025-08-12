@@ -114,7 +114,7 @@ class _BudgetFlightsTabState extends State<BudgetFlightsTab> {
               Text(
                 l10n.flightsFound(_filteredFlights.length),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
               Row(
@@ -146,13 +146,13 @@ class _BudgetFlightsTabState extends State<BudgetFlightsTab> {
                       Icon(
                         Icons.flight_takeoff,
                         size: 64,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         l10n.noFlightsMatch,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                       const SizedBox(height: 8),

@@ -98,7 +98,7 @@ class _PremiumFlightsTabState extends State<PremiumFlightsTab> {
               Text(
                 l10n.businessFirstPrivateDeals,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                  color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.8),
                 ),
               ),
             ],
@@ -241,13 +241,13 @@ class _PremiumFlightsTabState extends State<PremiumFlightsTab> {
               Text(
                 l10n.premiumFlightsFound(_filteredFlights.length),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -282,13 +282,13 @@ class _PremiumFlightsTabState extends State<PremiumFlightsTab> {
                       Icon(
                         Icons.flight_class,
                         size: 64,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         l10n.noPremiumFlights,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                       const SizedBox(height: 8),
