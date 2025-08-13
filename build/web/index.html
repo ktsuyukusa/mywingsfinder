@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MyWingsFinder - Find Your Best Travel - Budget flights, premium travel, and personalized flight deals">
+  <meta name="keywords" content="cheap flights, budget travel, Japan flights, Europe flights, flight deals, travel booking">
+  <meta name="author" content="MyWingsFinder">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.mywingfinder.com/">
+  <meta property="og:title" content="MyWingsFinder - Find Your Best Travel">
+  <meta property="og:description" content="Find the best flight deals from Japan to Europe and worldwide. Budget flights, premium travel options, and personalized deals.">
+  <meta property="og:site_name" content="MyWingsFinder">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://www.mywingfinder.com/">
+  <meta name="twitter:title" content="MyWingsFinder - Find Your Best Travel">
+  <meta name="twitter:description" content="Find the best flight deals from Japan to Europe and worldwide.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="MyWingsFinder">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>MyWingsFinder - Find Your Best Travel</title>
+  <link rel="manifest" href="manifest.json">
+
+</head>
+<body>
+  <!-- Define the service worker version variable that Flutter expects -->
+  <script>
+    const serviceWorkerVersion = "3295291615";
+  </script>
+  <script>
+    window.addEventListener('load', function(ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
+  
+  <!-- Travelpayouts API Tracking Script - Moved after Flutter initialization to prevent interference -->
+  <script data-noptimize="1" data-cfasync="false" data-wpfc-render="false">
+    (function () {
+        var script = document.createElement("script");
+        script.async = 1;
+        script.src = 'https://emrld.ltd/NDQ5Mjk0.js?t=449294';
+        document.head.appendChild(script);
+    })();
+  </script>
+</body>
+</html>

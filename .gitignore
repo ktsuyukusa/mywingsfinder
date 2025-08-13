@@ -5,7 +5,7 @@
 .packages
 .pub-cache/
 .pub/
-build/
+# build/  # Commented out to allow GitHub Actions to commit build files
 flutter/
 
 # Android

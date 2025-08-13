@@ -1,0 +1,41 @@
+name: Build Flutter Web and Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+        
+    - name: Get Flutter dependencies
+      run: flutter pub get
+      
+    - name: Build Flutter web
+      run: flutter build web
+      
+    - name: Commit build files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add build/
+        git commit -m "Auto-build Flutter web app [skip ci]" || exit 0
+        git push
+        
+    - name: Deploy to Vercel (if configured)
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.ORG_ID }}
+        vercel-project-id: ${{ secrets.PROJECT_ID }}
+        working-directory: ./
